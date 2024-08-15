@@ -1,0 +1,10 @@
+package io.github.lsmcodes.notes_api.service.security;
+
+import org.springframework.security.core.userdetails.UserDetailsService;
+
+/**
+ * Provides methods for user authentication.
+ */
+public interface SecurityService extends UserDetailsService {
+
+}

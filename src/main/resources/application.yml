@@ -1,0 +1,4 @@
+security:
+    token:
+        key: ${SECURITY_TOKEN_KEY}
+        expiration: 7200000
