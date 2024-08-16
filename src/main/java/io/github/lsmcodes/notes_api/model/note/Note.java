@@ -9,7 +9,7 @@ import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.modelmapper.ModelMapper;
 
-import io.github.lsmcodes.notes_api.dto.model.note.NoteDTO;
+import io.github.lsmcodes.notes_api.dto.model.note.NoteResponseDTO;
 import io.github.lsmcodes.notes_api.model.user.User;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -67,12 +67,12 @@ public class Note {
     private User user;
 
     /**
-     * Converts the current Note entity to a {@link NoteDTO}.
+     * Converts the current Note entity to a {@link NoteResponseDTO}.
      * 
-     * @return A {@link NoteDTO} instance representing the current Note.
+     * @return A {@link NoteResponseDTO} instance representing the current Note.
      */
-    public NoteDTO entityToDTO() {
-        return new ModelMapper().map(this, NoteDTO.class);
+    public NoteResponseDTO entityToDTO() {
+        return new ModelMapper().map(this, NoteResponseDTO.class);
     }
 
 }

@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import io.github.lsmcodes.notes_api.dto.model.user.UserDTO;
+import io.github.lsmcodes.notes_api.dto.model.user.UserResponseDTO;
 import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.model.note.Note;
 import jakarta.persistence.CascadeType;
@@ -67,12 +67,12 @@ public class User implements UserDetails {
     }
 
     /**
-     * Converts the current User entity to a {@link UserDTO}.
+     * Converts the current User entity to a {@link UserResponseDTO}.
      * 
-     * @return A {@link UserDTO} instance representing the current User.
+     * @return A {@link UserResponseDTO} instance representing the current User.
      */
-    public UserDTO entityToDTO() {
-        return new ModelMapper().map(this, UserDTO.class);
+    public UserResponseDTO entityToDTO() {
+        return new ModelMapper().map(this, UserResponseDTO.class);
     }
 
 }
