@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import io.github.lsmcodes.notes_api.model.note.Note;
+import io.github.lsmcodes.notes_api.model.user.User;
 
 /**
  * Provides methods for manipulating Note objects.
@@ -20,52 +24,64 @@ public interface NoteService {
     Note save(Note note);
 
     /**
-     * Checks whether a note exists based on the provided id.
+     * Checks whether a note exists based on the provided user and id.
      * 
-     * @param id The id to be searched for.
+     * @param user The owner of the note.
+     * @param id   The id of the note to be searched for.
      * @return {@code true} if the note exists; {@code false} otherwise.
      */
-    boolean existsById(UUID id);
+    boolean existsByUserAndId(User user, UUID id);
 
     /**
-     * Finds a note based on the provided id.
+     * Retrieves a note based on the provided user and id.
      * 
-     * @param id The id of the note to be searched for.
+     * @param user The owner of the note.
+     * @param id   The id of the note to be searched for.
      * @return An {@link Optional} containing the retrieved note if found, or
      *         {@code Optional.empty()} if no note is found.
      */
-    Optional<Note> findById(UUID id);
+    Optional<Note> findByUserAndId(User user, UUID id);
 
     /**
-     * Retrieves all notes stored in the database.
+     * Retrieves a {@link Page} of notes from the provided user.
      * 
-     * @return A {@link List} of all notes.
+     * @param user     The owner of the notes.
+     * @param pageable The pagination and sorting information.
+     * @return A {@link Page} of notes sorted by creation date, or
+     *         {@code Page.empty()} if there is no notes in the database.
      */
-    List<Note> findAll();
+    Page<Note> findByUser(User user, Pageable pageable);
 
     /**
-     * Finds notes where the title or content contains the provided term.
+     * Retrieves notes based on the provided user where the title or content
+     * contains the provided term.
      * 
-     * @param term The term to be searched for.
-     * @return An {@link List} of notes containing the term, or
-     *         {@code Collections.emptyList()} if no notes match.
+     * @param user     The owner of the notes.
+     * @param term     The term to be searched for.
+     * @param pageable The pagination and sorting information.
+     * @return An {@link Page} of notes containing the term, or
+     *         {@code Page.empty()} if no notes match.
      */
-    List<Note> findByTitleOrContentContainingIgnoreCase(String term);
+    Page<Note> findByUserAndTitleOrContentContainingIgnoreCase(User user, String term, Pageable pageable);
 
     /**
-     * Finds notes that have at least one tag from the specified list of tags.
+     * Retrieves notes based on the provided user that have at least one tag from
+     * the specified list of tags.
      * 
-     * @param tags A {@link List} of tags to be searched for.
-     * @return A {@link List} of notes with any of the specified tags, or
-     *         {@code Collections.emptyList()} if no notes have matching tags.
+     * @param user     The owner of the notes.
+     * @param tags     A {@link List} of tags to be searched for.
+     * @param pageable The pagination and sorting information.
+     * @return A {@link Page} of notes with any of the specified tags, or
+     *         {@code Page.empty()} if no notes have matching tags.
      */
-    List<Note> findByTagsInIgnoreCase(List<String> tags);
+    Page<Note> findByUserAndTagsInIgnoreCase(User user, List<String> tags, Pageable pageable);
 
     /**
-     * Deletes a note based on the provided id.
+     * Deletes a note based on the provided user and id.
      * 
-     * @param id The id of the note to be deleted.
+     * @param user The owner of the note.
+     * @param id   The id of the note to be deleted.
      */
-    void deleteById(UUID id);
+    void deleteByUserAndId(User user, UUID id);
 
 }

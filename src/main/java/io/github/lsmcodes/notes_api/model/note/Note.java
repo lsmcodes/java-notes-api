@@ -1,6 +1,7 @@
 package io.github.lsmcodes.notes_api.model.note;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,8 @@ public class Note {
     @ElementCollection
     @CollectionTable(name = "tags", joinColumns = @JoinColumn(name = "note_id"))
     @Column(name = "tag", length = 30, nullable = false)
-    private List<String> tags;
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
 
     @Column(length = 100, nullable = false)
     private String title;

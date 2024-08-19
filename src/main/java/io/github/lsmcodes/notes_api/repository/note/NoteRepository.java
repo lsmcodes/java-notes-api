@@ -1,12 +1,18 @@
 package io.github.lsmcodes.notes_api.repository.note;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import io.github.lsmcodes.notes_api.model.note.Note;
+import io.github.lsmcodes.notes_api.model.user.User;
+import jakarta.transaction.Transactional;
 
 /**
  * Implements a Note repository with CRUD JPA methods and customized methods.
@@ -14,23 +20,67 @@ import io.github.lsmcodes.notes_api.model.note.Note;
 public interface NoteRepository extends JpaRepository<Note, UUID> {
 
     /**
-     * Finds notes that contain the specified term in either the title or content,
-     * ignoring case.
+     * Verifies if a note exists by user and id.
      * 
-     * @param term The term to be searched for in the title or content of the notes.
-     * @return A {@link List} of notes that contain the specified term in the title
-     *         or content.
+     * @param user The note owner.
+     * @param id   The note id to be verified.
+     * @return {@code true} if the note exists; {@code false} otherwise.
      */
-    @Query(value = "SELECT * FROM notes n WHERE LOWER(n.title) LIKE LOWER(CONCAT('%', ?1, '%')) OR LOWER(n.content) LIKE LOWER(CONCAT('%', ?1, '%'))", nativeQuery = true)
-    List<Note> findByTitleOrContentContainingIgnoreCase(String term);
+    boolean existsByUserAndId(User user, UUID id);
 
     /**
-     * Finds notes that have at least one of the specified tags, ignoring case.
+     * Finds a note by user and id.
      * 
-     * @param tags The {@link List} of tags to be searched for in the notes.
-     * @return A {@link List} of notes that contain at least one of the specified
+     * @param user The note owner.
+     * @param id   The note id to be searched for.
+     * @return An {@link Optional} containing the note if found, or
+     *         {@code Optional.empty()} if no note is found.
+     */
+    Optional<Note> findByUserAndId(User user, UUID id);
+
+    /**
+     * Finds a {@link Page} of notes by user.
+     * 
+     * @param user     The notes owner.
+     * @param pageable The pagination and sorting information.
+     * @return A {@link Page} of notes sorted by creation date.
+     */
+    Page<Note> findByUser(User user, Pageable pageable);
+
+    /**
+     * Finds notes based on the provided user that contain the specified term in
+     * either the title or content, ignoring case.
+     * 
+     * @param user     The notes owner.
+     * @param term     The term to be searched for in the title or content of the
+     *                 notes.
+     * @param pageable The pagination and sorting information.
+     * @return A {@link Page} of notes that contain the specified term in the title
+     *         or content.
+     */
+    @Query("SELECT n FROM notes n WHERE n.user = :user AND LOWER(n.title) LIKE LOWER(CONCAT('%', :term, '%')) OR LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%'))")
+    Page<Note> findByUserAndTitleOrContentContainingIgnoreCase(@Param("user") User user, @Param("term") String term,
+            Pageable pageable);
+
+    /**
+     * Finds notes based on the provided user that have at least one of the
+     * specified tags, ignoring case.
+     * 
+     * @param user     The notes owner.
+     * @param tags     The {@link List} of tags to be searched for in the notes.
+     * @param pageable The pagination and sorting information.
+     * @return A {@link Page} of notes that contain at least one of the specified
      *         tags.
      */
-    List<Note> findByTagsInIgnoreCase(List<String> tags);
+    Page<Note> findByUserAndTagsInIgnoreCase(User user, List<String> tags, Pageable pageable);
+
+    /**
+     * Deletes a note based on the provided user and id.
+     * 
+     * @param user The notes owner.
+     * @param id   The id of the note to be deleted.
+     */
+    @Transactional
+    void deleteByUserAndId(User user, UUID id);
 
 }
