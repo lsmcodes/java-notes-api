@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.model.user.User;
+import io.github.lsmcodes.notes_api.util.NotesApiUtil;
 
 /**
  * Integration tests for the methods provided by the {@link TokenService}
@@ -37,17 +37,15 @@ public class TokenServiceTest {
     @DisplayName("TokenService generateToken method should return a valid token")
     public void generateToken_ShouldReturnAValidToken() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser();
 
         // Act
         String token = this.tokenService.generateToken(user);
         System.out.println(token);
 
         // Assert
-        assertThat(token)
-                .isNotNull()
-                .startsWith("ey");
-        assertThat(tokenService.getSubjectFromToken(token)).isEqualTo("default_user");
+        assertThat(token).isNotNull().startsWith("ey");
+        assertThat(tokenService.getSubjectFromToken(token)).isEqualTo(user.getUsername());
         assertThat(token.split("\\.")).hasSize(3);
     }
 
@@ -60,14 +58,14 @@ public class TokenServiceTest {
     @DisplayName("TokenService getSubjectFromToken method should return the correct subject")
     public void getSubjectFromToken_ShouldReturnTheCorrectSubject() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser();
         String token = this.tokenService.generateToken(user);
 
         // Act
         String subject = this.tokenService.getSubjectFromToken(token);
 
         // Assert
-        assertThat(subject).isEqualTo("default_user");
+        assertThat(subject).isEqualTo(user.getUsername());
     }
 
     /**
@@ -87,22 +85,7 @@ public class TokenServiceTest {
         System.out.println(expirationDate);
 
         // Assert
-        assertThat(expirationDate)
-                .isNotEqualTo(currentDate)
-                .isAfter(currentDate);
-    }
-
-    /**
-     * Creates a generic {@link User} instance for use in tests.
-     * 
-     * @return The created {@link User} instance.
-     */
-    private User getNewUser() {
-        return User.builder()
-                .name("Default User")
-                .username("default_user")
-                .password("user1234")
-                .role(UserRole.ROLE_USER).build();
+        assertThat(expirationDate).isNotEqualTo(currentDate).isAfter(currentDate);
     }
 
 }

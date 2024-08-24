@@ -17,9 +17,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
-import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.model.user.User;
 import io.github.lsmcodes.notes_api.repository.user.UserRepository;
+import io.github.lsmcodes.notes_api.util.NotesApiUtil;
 
 /**
  * Unit tests for the {@link UserServiceImpl} class.
@@ -37,34 +37,34 @@ public class UserServiceImplTest {
 
     /**
      * Tests the {@link UserServiceImpl#save(User user)} method to ensure it
-     * correctly saves an user to the database.
+     * interacts correctly with the {@link UserRepository#save(User user)} method
+     * providing the specified user.
      */
     @Order(1)
-    @DisplayName("UserServiceImpl save method should save user")
+    @DisplayName("UserServiceImpl save method should interact correctly with the repository")
     @Test
-    public void save_ShouldSaveUser() {
+    public void save_ShouldInteractCorrectlyWithTheRepository() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser();
         Mockito.when(this.userRepository.save(user)).thenReturn(user);
 
         // Act
         User savedUser = this.userServiceImpl.save(user);
 
         // Assert
-        assertThat(savedUser)
-                .isNotNull()
-                .isEqualTo(user);
+        assertThat(savedUser).isNotNull().isEqualTo(user);
     }
 
     /**
      * Tests the {@link UserServiceImpl#existsByUsername(String username)} method to
-     * ensure it correctly verifies if an user exists in the database by the
-     * provided username.
+     * ensure it interacts correctly with the
+     * {@link UserRepository#existsByUsername(String username)} method providing the
+     * specified username.
      */
     @Test
     @Order(2)
-    @DisplayName("UserServiceImpl existsByUsername method should return true when user exists")
-    public void existsByUsername_ShouldReturnTrue_WhenUserExists() {
+    @DisplayName("UserServiceImpl existsByUsername method should interact correctly with the repository")
+    public void existsByUsername_ShouldInteractCorrectlyWithTheRepository() {
         // Arrange
         Mockito.when(this.userRepository.existsByUsername("default_user")).thenReturn(true);
 
@@ -77,15 +77,16 @@ public class UserServiceImplTest {
 
     /**
      * Tests the {@link UserServiceImpl#findById(UUID id)} method to ensure it
-     * correctly retrieves an user by the provided id from the database.
+     * interacts correctly with the {@link UserRepository#findById(UUID id)}
+     * method providing the specified id.
      */
     @Test
     @Order(3)
-    @DisplayName("UserServiceImpl findById method should return correct user")
-    public void findById_ShouldReturnCorrectUser() {
+    @DisplayName("UserServiceImpl findById method should interact correctly with the repository")
+    public void findById_ShouldInteractCorrectlyWithTheRepository() {
         // Arrange
-        User user = getNewUser();
-        UUID id = UUID.fromString("8b94e336-4c1d-4014-8b2c-70300e443e97");
+        User user = NotesApiUtil.getNewUser();
+        UUID id = user.getId();
 
         Mockito.when(this.userRepository.findById(id)).thenReturn(Optional.of(user));
 
@@ -99,16 +100,17 @@ public class UserServiceImplTest {
 
     /**
      * Tests the {@link UserServiceImpl#findByUsername(String username)} method to
-     * ensure it correctly retrieves an user by the provided username from the
-     * database.
+     * ensure it interacts correctly with the
+     * {@link UserRepository#findByUsername(String username)} method providing the
+     * specified username.
      */
     @Test
     @Order(4)
-    @DisplayName("UserServiceImpl findByUsername method should return correct user")
-    public void findByUsername_ShouldReturnCorrectUser() {
+    @DisplayName("UserServiceImpl findByUsername method should interact correctly with the repository")
+    public void findByUsername_ShouldInteractCorrectlyWithTheRepository() {
         // Arrange
-        User user = getNewUser();
-        String username = "default_user";
+        User user = NotesApiUtil.getNewUser();
+        String username = user.getUsername();
 
         Mockito.when(this.userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
@@ -121,35 +123,22 @@ public class UserServiceImplTest {
     }
 
     /**
-     * Tests the {@link UserServiceImpl#deleteById(UUID id)} method to
-     * ensure it correctly deletes an user correctly by the provided id from the
-     * database.
+     * Tests the {@link UserServiceImpl#deleteById(UUID id)} method to ensure it
+     * interacts correctly with the {@link UserRepository#deleteById(UUID id)}
+     * method providing the specified id.
      */
     @Test
     @Order(5)
-    @DisplayName("UserServiceImpl deleteById method should delete correct user")
-    public void deleteById_ShouldDeleteCorrectUser() {
+    @DisplayName("UserServiceImpl deleteById method should interact correctly with the repository")
+    public void deleteById_ShouldInteractCorrectlyWithTheRepository() {
         // Arrange
-        UUID id = UUID.fromString("8b94e336-4c1d-4014-8b2c-70300e443e97");
+        UUID id = UUID.randomUUID();
 
         // Act
         this.userServiceImpl.deleteById(id);
 
         // Assert
         Mockito.verify(this.userRepository).deleteById(id);
-    }
-
-    /**
-     * Creates a generic {@link User} instance for use in tests.
-     * 
-     * @return The created {@link User} instance.
-     */
-    private User getNewUser() {
-        return User.builder()
-                .name("Default User")
-                .username("default_user")
-                .password("user1234")
-                .role(UserRole.ROLE_USER).build();
     }
 
 }
