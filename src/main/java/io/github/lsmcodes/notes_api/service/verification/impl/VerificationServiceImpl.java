@@ -4,6 +4,9 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import io.github.lsmcodes.notes_api.exception.NoteNotFoundException;
@@ -66,6 +69,30 @@ public class VerificationServiceImpl implements VerificationService {
         if (!this.noteService.existsByUserAndId(user, id)) {
             throw new NoteNotFoundException("There is no user with the provided id");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean verifyIfCurrentUserIsAuthenticated() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null)
+            return false;
+
+        return (authentication.isAuthenticated()) && (authentication instanceof UsernamePasswordAuthenticationToken);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean verifyIfCurrentUserIsNotAuthenticated() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null)
+            return true;
+
+        return (authentication.isAuthenticated()) && (authentication instanceof AnonymousAuthenticationToken);
     }
 
 }

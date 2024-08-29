@@ -1,4 +1,29 @@
+spring:
+  cache:
+    type: jcache
+    jcache:
+      provider: com.hazelcast.cache.impl.HazelcastServerCachingProvider
+      config: classpath:hazelcast.xml
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: notesApiRateLimit
+      filter-order: 100
+      url: "/notes-api/.*"
+      rate-limits:
+        - execute-condition: "@verificationServiceImpl.verifyIfCurrentUserIsNotAuthenticated()"
+          cache-key: "getRemoteAddr()"
+          bandwidths:
+            - capacity: 5
+              time: 1
+              unit: minutes
+        - execute-condition: "@verificationServiceImpl.verifyIfCurrentUserIsAuthenticated()"
+          cache-key: "@securityServiceImpl.getCurrentAuthenticatedUser()"
+          bandwidths:
+            - capacity: 50
+              time: 1
+              unit: minutes
 security:
-    token:
-        key: ${SECURITY_TOKEN_KEY}
-        expiration: 7200000
+  token:
+    key: ${SECURITY_TOKEN_KEY}
+    expiration: 7200000

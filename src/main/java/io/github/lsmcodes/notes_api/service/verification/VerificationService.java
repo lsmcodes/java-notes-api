@@ -14,7 +14,7 @@ import io.github.lsmcodes.notes_api.model.user.User;
  * Provides methods for verifying various conditions related to users and notes.
  */
 public interface VerificationService {
-    
+
     /**
      * Verifies if a user exists by username.
      * 
@@ -27,7 +27,8 @@ public interface VerificationService {
      * Verifies if a username does not exists.
      * 
      * @param username The username to be searched for.
-     * @throws UsernameAlreadyExistsException If the username already exists in the database.
+     * @throws UsernameAlreadyExistsException If the username already exists in the
+     *                                        database.
      */
     public void verifyIfUsernameDoesNotExist(String username) throws UsernameAlreadyExistsException;
 
@@ -43,9 +44,25 @@ public interface VerificationService {
      * Verifies if a note exists by user and id.
      * 
      * @param user The owner of the note.
-     * @param id The id of the note to be searched for.
+     * @param id   The id of the note to be searched for.
      * @throws NoteNotFoundException If no note is found.
      */
     public void verifyIfNoteExistsByUserAndId(User user, UUID id) throws NoteNotFoundException;
+
+    /**
+     * Verifies if the current user is authenticated.
+     * 
+     * @return {@code true} if the current user is authenticated; {@code false}
+     *         otherwise.
+     */
+    public boolean verifyIfCurrentUserIsAuthenticated();
+
+    /**
+     * Verifies if the current user is not authenticated.
+     * 
+     * @return {@code true} if the current user is not authenticated; {@code false}
+     *         otherwise.
+     */
+    public boolean verifyIfCurrentUserIsNotAuthenticated();
 
 }

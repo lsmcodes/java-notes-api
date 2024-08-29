@@ -7,4 +7,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  */
 public interface SecurityService extends UserDetailsService {
 
+    /**
+     * Returns the username of the current authenticated user.
+     * 
+     * @return The username of the current user.
+     */
+    public String getCurrentAuthenticatedUser();
+
 }

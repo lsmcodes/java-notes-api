@@ -3,6 +3,7 @@ package io.github.lsmcodes.notes_api.service.security.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,15 @@ public class SecurityServiceImpl implements SecurityService {
         }
 
         return user.get();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getCurrentAuthenticatedUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 
 }

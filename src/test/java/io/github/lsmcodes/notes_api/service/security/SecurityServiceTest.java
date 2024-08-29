@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -48,6 +50,26 @@ public class SecurityServiceTest {
 
         // Assert
         assertThat(userDetails).isEqualTo(user);
+    }
+
+    /**
+     * Tests the {@link SecurityService#getCurrentAuthenticatedUser()} to
+     * ensure it returns the username of the current authenticated user.
+     */
+    @Test
+    @Order(2)
+    @DisplayName("SecurityService getCurrentAuthenticatedUser method should return username of the authenticated user")
+    public void getCurrentAuthenticatedUser_ShouldReturnUsernameOfTheAuthenticatedUser() {
+        // Arrange
+        User user = NotesApiUtil.getNewUser();
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+
+        // Act
+        String username = this.securityService.getCurrentAuthenticatedUser();
+
+        // Assert
+        assertThat(username).isEqualTo(user.getUsername());
     }
 
 }

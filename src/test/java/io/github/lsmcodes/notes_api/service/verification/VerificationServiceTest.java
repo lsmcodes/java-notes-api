@@ -1,7 +1,10 @@
 package io.github.lsmcodes.notes_api.service.verification;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +16,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
 import io.github.lsmcodes.notes_api.exception.NoteNotFoundException;
@@ -109,6 +116,46 @@ public class VerificationServiceTest {
         // Act and Assert
         assertThrows(NoteNotFoundException.class,
                 () -> this.verificationService.verifyIfNoteExistsByUserAndId(user, UUID.randomUUID()));
+    }
+
+    /**
+     * Tests the {@link VerificationService#verifyIfCurrentUserIsAuthenticated()} to
+     * ensure it correctly returns true when user is authenticated.
+     */
+    @Test
+    @Order(5)
+    @DisplayName("VerificationService verifyIfCurrentUserIsAuthenticated method should return true when user is authenticated")
+    public void verifyIfCurrentUserIsAuthenticated_ShouldReturnTrue_WhenUserIsAuthenticated() {
+        // Arrange
+        User user = NotesApiUtil.getNewUser();
+        SecurityContextHolder.getContext()
+                .setAuthentication(
+                        new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+
+        // Act and Assert
+        assertTrue(this.verificationService.verifyIfCurrentUserIsAuthenticated());
+        SecurityContextHolder.clearContext();
+        assertFalse(this.verificationService.verifyIfCurrentUserIsAuthenticated());
+    }
+
+    /**
+     * Tests the {@link VerificationService#verifyIfCurrentUserIsNotAuthenticated()}
+     * to ensure it correctly returns true when user is not authenticated.
+     */
+    @Test
+    @Order(6)
+    @DisplayName("VerificationService verifyIfCurrentUserIsNotAuthenticated method should return true when user is not authenticated")
+    public void verifyIfCurrentUserIsNotAuthenticated_ShouldReturnTrue_WhenUserIsNotAuthenticated() {
+        // Arrange
+        SecurityContextHolder.clearContext();
+
+        // Act and Assert
+        assertTrue(this.verificationService.verifyIfCurrentUserIsNotAuthenticated());
+        SecurityContextHolder.getContext()
+                .setAuthentication(
+                        new AnonymousAuthenticationToken("unique-key", "anonymousUser",
+                                List.of(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        assertTrue(this.verificationService.verifyIfCurrentUserIsNotAuthenticated());
     }
 
 }
