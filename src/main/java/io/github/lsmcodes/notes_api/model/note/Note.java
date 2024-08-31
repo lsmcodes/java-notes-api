@@ -1,6 +1,7 @@
 package io.github.lsmcodes.notes_api.model.note;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +10,7 @@ import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.modelmapper.ModelMapper;
 
-import io.github.lsmcodes.notes_api.dto.model.note.NoteDTO;
+import io.github.lsmcodes.notes_api.dto.model.note.NoteResponseDTO;
 import io.github.lsmcodes.notes_api.model.user.User;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -46,7 +47,8 @@ public class Note {
     @ElementCollection
     @CollectionTable(name = "tags", joinColumns = @JoinColumn(name = "note_id"))
     @Column(name = "tag", length = 30, nullable = false)
-    private List<String> tags;
+    @Builder.Default
+    private List<String> tags = new ArrayList<>();
 
     @Column(length = 100, nullable = false)
     private String title;
@@ -67,12 +69,12 @@ public class Note {
     private User user;
 
     /**
-     * Converts the current Note entity to a {@link NoteDTO}.
+     * Converts the current Note entity to a {@link NoteResponseDTO}.
      * 
-     * @return A {@link NoteDTO} instance representing the current Note.
+     * @return A {@link NoteResponseDTO} instance representing the current Note.
      */
-    public NoteDTO entityToDTO() {
-        return new ModelMapper().map(this, NoteDTO.class);
+    public NoteResponseDTO entityToDTO() {
+        return new ModelMapper().map(this, NoteResponseDTO.class);
     }
 
 }

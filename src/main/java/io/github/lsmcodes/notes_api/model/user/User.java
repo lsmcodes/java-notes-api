@@ -1,5 +1,6 @@
 package io.github.lsmcodes.notes_api.model.user;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import io.github.lsmcodes.notes_api.dto.model.user.UserDTO;
+import io.github.lsmcodes.notes_api.dto.model.user.UserResponseDTO;
 import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.model.note.Note;
 import jakarta.persistence.CascadeType;
@@ -17,7 +18,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -58,8 +58,9 @@ public class User implements UserDetails {
     @Column(length = 10, nullable = false)
     private UserRole role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Note> notes;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Note> notes = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,12 +68,12 @@ public class User implements UserDetails {
     }
 
     /**
-     * Converts the current User entity to a {@link UserDTO}.
+     * Converts the current User entity to a {@link UserResponseDTO}.
      * 
-     * @return A {@link UserDTO} instance representing the current User.
+     * @return A {@link UserResponseDTO} instance representing the current User.
      */
-    public UserDTO entityToDTO() {
-        return new ModelMapper().map(this, UserDTO.class);
+    public UserResponseDTO entityToDTO() {
+        return new ModelMapper().map(this, UserResponseDTO.class);
     }
 
 }

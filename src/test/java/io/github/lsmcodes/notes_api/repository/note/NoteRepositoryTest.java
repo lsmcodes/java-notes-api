@@ -13,9 +13,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import io.github.lsmcodes.notes_api.model.note.Note;
+import io.github.lsmcodes.notes_api.model.user.User;
+import io.github.lsmcodes.notes_api.repository.user.UserRepository;
+import io.github.lsmcodes.notes_api.util.NotesApiUtil;
 
 /**
  * Integration tests for the {@link NoteRepository} interface.
@@ -28,6 +35,9 @@ public class NoteRepositoryTest {
     @Autowired
     private NoteRepository noteRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     /**
      * Tests the save repository method to ensure it correctly saves a note to the
      * database.
@@ -37,52 +47,56 @@ public class NoteRepositoryTest {
     @DisplayName("NoteRepository save method should save note")
     public void save_ShouldSaveNote() {
         // Arrange
-        Note note = Note.builder()
-                .tags(List.of("Tag"))
-                .title("First Note")
-                .content("Sample content")
-                .build();
+        Note note = Note.builder().tags(List.of("Tag")).title("Sample Title").content("Sample content.").build();
 
         // Act
         Note savedNote = this.noteRepository.save(note);
 
         // Assert
-        assertThat(savedNote)
-                .isNotNull()
-                .isEqualTo(note);
+        assertThat(savedNote).isNotNull().isEqualTo(note);
     }
 
     /**
-     * Tests the existsById repository method to ensure it correctly verifies if a
-     * note exists in the database by the provided id.
+     * Tests the {@link NoteRepository#existsByUserAndId(User user, UUID id)}
+     * repository method to ensure it correctly verifies if a note exists in the
+     * database by the provided user and id.
      */
     @Test
     @Order(2)
-    @DisplayName("NoteRepository existsById method should return true when note exists")
-    public void existsById_ShouldReturnTrue_WhenNoteExists() {
+    @DisplayName("NoteRepository existsByUserAndId method should return true when note exists")
+    public void existsByUserAndId_ShouldReturnTrue_WhenNoteExists() {
         // Arrange
-        Note note = getNewNote();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note note = NotesApiUtil.getNewNote(this.noteRepository);
+
+        user.getNotes().add(note);
+        note.setUser(user);
 
         // Act
-        boolean noteExists = this.noteRepository.existsById(note.getId());
+        boolean noteExists = this.noteRepository.existsByUserAndId(user, note.getId());
 
         // Assert
         assertThat(noteExists).isTrue();
     }
 
     /**
-     * Tests the findById repository method to ensure it correctly retrieves a note
-     * by the provided id from the database.
+     * Tests the {@link NoteRepository#findByUserAndId(User user, UUID id)}
+     * repository method to ensure it correctly retrieves a note by the provided
+     * user and id from the database.
      */
     @Test
     @Order(3)
-    @DisplayName("NoteRepository findById method should return correct note")
-    public void findById_ShouldReturnCorrectNote() {
+    @DisplayName("NoteRepository findByUserAndId method should return correct note")
+    public void findByUserAndId_ShouldReturnCorrectNote() {
         // Arrange
-        Note note = getNewNote();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note note = NotesApiUtil.getNewNote(this.noteRepository);
+
+        user.getNotes().add(note);
+        note.setUser(user);
 
         // Act
-        Optional<Note> foundNote = this.noteRepository.findById(note.getId());
+        Optional<Note> foundNote = this.noteRepository.findByUserAndId(user, note.getId());
 
         // Assert
         assertThat(foundNote).isPresent();
@@ -90,103 +104,122 @@ public class NoteRepositoryTest {
     }
 
     /**
-     * Tests the findAll repository method to ensure it correctly retrieves all
-     * notes from the database.
+     * Tests the {@link NoteRepository#findByUser(User user, Pageable pageable)}
+     * repository method to ensure it correctly retrieves all notes from a user.
      */
     @Test
     @Order(4)
-    @DisplayName("NoteRepository findAll method should return all notes")
-    public void findAll_ShouldReturnAllNotes() {
+    @DisplayName("NoteRepository findByUser method should return all notes")
+    public void findByUser_ShouldReturnAllNotes() {
         // Arrange
-        List<Note> notes = List.of(getNewNote(), getNewNote());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("title").ascending());
+
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note firstNote = NotesApiUtil.getNewNote(this.noteRepository);
+        Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
+        firstNote.setTitle("A sample title");
+
+        user.getNotes().addAll(List.of(firstNote, secondNote));
+        firstNote.setUser(user);
+        secondNote.setUser(user);
 
         // Act
-        List<Note> foundNotes = this.noteRepository.findAll();
+        Page<Note> foundPage = this.noteRepository.findByUser(user, pageable);
+        List<Note> pageContent = foundPage.getContent();
 
         // Assert
-        assertThat(foundNotes)
-                .hasSize(2)
-                .containsAll(notes);
+        assertThat(pageContent).hasSize(2);
+        assertThat(pageContent.get(0)).isEqualTo(firstNote);
+        assertThat(pageContent.get(1)).isEqualTo(secondNote);
     }
 
     /**
      * Tests the
-     * {@link NoteRepository#findByTitleOrContentContainingIgnoreCase(String term)}
-     * method to ensure it finds notes whose title or content contains the specified
-     * term, ignoring case.
+     * {@link NoteRepository#findByUserAndTitleOrContentContainingIgnoreCase(User user, String term, Pageable pageable)}
+     * method to ensure it finds notes from the provided user whose title or content
+     * contains the specified term, ignoring case.
      */
     @Test
     @Order(5)
-    @DisplayName("NoteRepository findByTitleOrContentContainingIgnoreCase method should return correct note")
-    public void findByTitleOrContentContainingIgnoreCase_ShouldReturnCorrectNote() {
+    @DisplayName("NoteRepository findByUserAndTitleOrContentContainingIgnoreCase method should return correct note")
+    public void findByUserAndTitleOrContentContainingIgnoreCase_ShouldReturnCorrectNote() {
         // Arrange
-        List<Note> notes = List.of(getNewNote(), getNewNote());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("title").descending());
+
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note firstNote = NotesApiUtil.getNewNote(this.noteRepository);
+        Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
+        secondNote.setTitle("A sample title");
+
+        user.getNotes().addAll(List.of(firstNote, secondNote));
+        firstNote.setUser(user);
+        secondNote.setUser(user);
 
         // Act
-        List<Note> foundNotes = this.noteRepository.findByTitleOrContentContainingIgnoreCase("sample");
+        Page<Note> foundPage = this.noteRepository.findByUserAndTitleOrContentContainingIgnoreCase(user, "sample",
+                pageable);
+        List<Note> pageContent = foundPage.getContent();
 
         // Assert
-        assertThat(foundNotes)
-                .hasSize(2)
-                .containsAll(notes);
+        assertThat(pageContent).hasSize(2);
+        assertThat(pageContent.get(0)).isEqualTo(firstNote);
+        assertThat(pageContent.get(1)).isEqualTo(secondNote);
     }
 
     /**
-     * Tests the {@link NoteRepository#findByTagsInIgnoreCase(List<String> tags)}
-     * method to ensure it finds notes whose tags contains at least one of the
-     * specified tags, ignoring case.
+     * Tests the
+     * {@link NoteRepository#findByUserAndTagsInIgnoreCase(User user, List tags, Pageable pageable)}
+     * method to ensure it finds notes from the provided user whose tags contains at
+     * least one of the specified tags, ignoring case.
      */
     @Test
     @Order(6)
-    @DisplayName("NoteRepository findByTagsInIgnoreCase method should return correct notes")
-    public void findByTagsInIgnoreCase_ShouldReturnCorrectNotes() {
+    @DisplayName("NoteRepository findByUserAndTagsInIgnoreCase method should return correct notes")
+    public void findByUserAndTagsInIgnoreCase_ShouldReturnCorrectNotes() {
         // Arrange
-        List<Note> notes = List.of(getNewNote(), getNewNote());
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("title").ascending());
+
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note firstNote = NotesApiUtil.getNewNote(this.noteRepository);
+        Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
+        firstNote.setTitle("A sample title");
+
+        user.getNotes().addAll(List.of(firstNote, secondNote));
+        firstNote.setUser(user);
+        secondNote.setUser(user);
 
         // Act
-        List<Note> foundNotesByTag = this.noteRepository.findByTagsInIgnoreCase(List.of("tag"));
-        List<Note> foundNotesByTags = this.noteRepository.findByTagsInIgnoreCase(List.of("Tag", "Another tag"));
+        Page<Note> foundPage = this.noteRepository.findByUserAndTagsInIgnoreCase(user, List.of("tag"), pageable);
+        List<Note> pageContent = foundPage.getContent();
 
         // Assert
-        assertThat(foundNotesByTag)
-                .hasSize(2)
-                .containsAll(notes);
-
-        assertThat(foundNotesByTags)
-                .hasSize(2)
-                .containsAll(notes);
+        assertThat(pageContent).hasSize(2);
+        assertThat(pageContent.get(0)).isEqualTo(firstNote);
+        assertThat(pageContent.get(1)).isEqualTo(secondNote);
     }
 
     /**
-     * Tests the deleteById repository method to ensure it correctly deletes a note
-     * correctly by the provided id from the database.
+     * Tests the {@link NoteRepository#deleteByUserAndId(User user, UUID id)}
+     * repository method to ensure it correctly deletes a note correctly by the
+     * provided user and id from the database.
      */
     @Test
     @Order(7)
-    @DisplayName("NoteRepository deleteById method should delete correct note")
-    public void deleteById_ShouldDeleteCorrectNote() {
+    @DisplayName("NoteRepository deleteByUserAndId method should delete correct note")
+    public void deleteByUserAndId_ShouldDeleteCorrectNote() {
         // Arrange
-        Note note = getNewNote();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note note = NotesApiUtil.getNewNote(this.noteRepository);
         UUID noteId = note.getId();
 
-        // Act and Assert
-        assertThat(this.noteRepository.existsById(noteId)).isTrue();
-        this.noteRepository.deleteById(noteId);
-        assertThat(this.noteRepository.existsById(noteId)).isFalse();
-    }
+        user.getNotes().add(note);
+        note.setUser(user);
 
-    /**
-     * Creates and saves a generic {@link Note} instance for use in tests.
-     * 
-     * @return The saved {@link Note} instance.
-     */
-    private Note getNewNote() {
-        Note note = Note.builder()
-                .tags(List.of("Tag", "Another Tag"))
-                .title("Untitled")
-                .content("Sample content")
-                .build();
-        return this.noteRepository.save(note);
+        // Act and Assert
+        assertThat(this.noteRepository.existsByUserAndId(user, noteId)).isTrue();
+        user.getNotes().remove(note);
+        this.noteRepository.deleteByUserAndId(user, noteId);
+        assertThat(this.noteRepository.existsByUserAndId(user, noteId)).isFalse();
     }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.model.user.User;
+import io.github.lsmcodes.notes_api.util.NotesApiUtil;
 
 /**
  * Integration tests for the {@link UserRepository} interface.
@@ -37,19 +38,13 @@ public class UserRepositoryTest {
     @DisplayName("UserRepository save method should save user")
     public void save_ShouldSaveUser() {
         // Arrange
-        User user = User.builder()
-                .name("User")
-                .username("user")
-                .password("user1234")
-                .role(UserRole.ROLE_USER).build();
+        User user = User.builder().name("User").username("user").password("user1234").role(UserRole.ROLE_USER).build();
 
         // Act
         User savedUser = this.userRepository.save(user);
 
         // Assert
-        assertThat(savedUser)
-                .isNotNull()
-                .isEqualTo(user);
+        assertThat(savedUser).isNotNull().isEqualTo(user);
     }
 
     /**
@@ -61,7 +56,7 @@ public class UserRepositoryTest {
     @DisplayName("UserRepository existsByUsername method should return true when user exists")
     public void existsByUsername_ShouldReturnTrue_WhenUserExists() {
         // Arrange
-        getNewUser();
+        NotesApiUtil.getNewUser(this.userRepository);
 
         // Act
         boolean userExists = this.userRepository.existsByUsername("default_user");
@@ -79,7 +74,7 @@ public class UserRepositoryTest {
     @DisplayName("UserRepository findById method should return correct user")
     public void findById_ShouldReturnCorrectUser() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
 
         // Act
         Optional<User> foundUser = this.userRepository.findById(user.getId());
@@ -99,7 +94,7 @@ public class UserRepositoryTest {
     @DisplayName("UserRepository findByUsername method should return correct user")
     public void findByUsername_ShouldReturnCorrectUser() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
 
         // Act
         Optional<User> foundUser = this.userRepository.findByUsername("default_user");
@@ -118,27 +113,13 @@ public class UserRepositoryTest {
     @DisplayName("UserRepository deleteById method should delete correct user")
     public void deleteById_ShouldDeleteCorrectUser() {
         // Arrange
-        User user = getNewUser();
+        User user = NotesApiUtil.getNewUser(this.userRepository);
         UUID userId = user.getId();
 
         // Act and Assert
         assertThat(this.userRepository.existsById(userId)).isTrue();
         this.userRepository.deleteById(userId);
         assertThat(this.userRepository.existsById(userId)).isFalse();
-    }
-
-    /**
-     * Creates and saves a generic {@link User} instance for use in tests.
-     * 
-     * @return The saved {@link User} instance.
-     */
-    private User getNewUser() {
-        User user = User.builder()
-                .name("Default User")
-                .username("default_user")
-                .password("user1234")
-                .role(UserRole.ROLE_USER).build();
-        return this.userRepository.save(user);
     }
 
 }
