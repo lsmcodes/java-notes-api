@@ -123,7 +123,7 @@ public class UserController {
      * @throws UsernameAlreadyExistsException If the provided username already
      *                                        exists in the database.
      */
-    @Operation(summary = "Updates logged-in user details (invalidates the current token)")
+    @Operation(summary = "Updates logged-in user details (invalidates the current JWT token, a new token must be issued, unless the details are reverted to their original values)")
     @SecurityRequirement(name = "JWT token")
     @PutMapping
     public ResponseEntity<Response<UserResponseDTO>> updateLoggedInUser(@RequestBody @Valid UserRequestDTO dto,

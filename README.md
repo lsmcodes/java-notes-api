@@ -33,10 +33,6 @@
                 <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/PostgreSQL-black?style=for-the-badge&logo=PostgreSQL&logoColor=white">
                 <img src="https://img.shields.io/badge/PostgreSQL-white?style=for-the-badge&logo=PostgreSQL&logoColor=black" />
         </picture>
-        <picture>
-                <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/badge/Railway-black?style=for-the-badge&logo=Railway&logoColor=white">
-                <img src="https://img.shields.io/badge/Railway-white?style=for-the-badge&logo=Railway&logoColor=black" />
-        </picture>
 </div>
 
 ## Overview
@@ -62,15 +58,14 @@ This API provides the following endpoints:
 }
 ```
 
-
 ### User
 
-| URI                  | Method | Action                                                                     | Parameters | Request Body |
-| -------------------- | ------ | -------------------------------------------------------------------------- | ---------- | ------------ |
-| `/notes-api/users` | POST   | Creates a user                                                             | N/A        | User Schema  |
-| `/notes-api/users` | GET    | Retrieves the authenticated user details                                   | N/A        | N/A          |
-| `/notes-api/users` | PUT    | Updates the authenticated user details (invalidates the current JWT token) | N/A        | User Schema  |
-| `/notes-api/users` | DELETE | Deletes the authenticated user                                             | N/A        | N/A          |
+| URI                  | Method | Action                                                                                                                                                            | Parameters | Request Body |
+| -------------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------ |
+| `/notes-api/users` | POST   | Creates a user                                                                                                                                                    | N/A        | User Schema  |
+| `/notes-api/users` | GET    | Retrieves the authenticated user details                                                                                                                          | N/A        | N/A          |
+| `/notes-api/users` | PUT    | Updates the authenticated user details (invalidates the current JWT token, a new token must be issued, unless the details are reverted to their original values) | N/A        | User Schema  |
+| `/notes-api/users` | DELETE | Deletes the authenticated user                                                                                                                                    | N/A        | N/A          |
 
 #### User Schema
 
@@ -91,7 +86,7 @@ This API provides the following endpoints:
 | `/notes-api/notes/search/by-term` | GET    | Retrieves all notes containing a term whether in title or content | term, page, size, property, sortDirection | N/A          |
 | `/notes-api/notes/search/by-tags` | GET    | Retrieves all notes containing at least one of the specified tags  | tags, page, size, property, sortDirection | N/A          |
 | `/notes-api/notes/{id}`           | PUT    | Updates a note by id                                               | id                                        | Note Schema  |
-| `/notes-api/notes/{id}`           | DELETE | Deletes a note by id                                               | id                                        | Note Schema  |
+| `/notes-api/notes/{id}`           | DELETE | Deletes a note by id                                               | id                                        | N/A          |
 
 #### Note Schema
 
