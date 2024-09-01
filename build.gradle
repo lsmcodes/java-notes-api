@@ -37,6 +37,7 @@ dependencies {
 	implementation 'com.hazelcast:hazelcast-spring:5.5.0'
 	implementation 'com.giffing.bucket4j.spring.boot.starter:bucket4j-spring-boot-starter:0.12.7'
 	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.17.2'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	runtimeOnly 'com.h2database:h2'
