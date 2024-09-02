@@ -292,7 +292,7 @@ public class NoteControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/notes-api/notes/{id}", id)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value("The note \"" + note.getTitle() + "\" was deleted successfully"));
+                .andExpect(jsonPath("$.data").value("The note was deleted successfully"));
     }
 
     /**

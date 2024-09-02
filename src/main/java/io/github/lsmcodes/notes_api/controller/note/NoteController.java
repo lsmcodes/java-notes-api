@@ -334,6 +334,7 @@ public class NoteController {
         User loggedInUser = this.userService.findByUsername(username).get();
 
         this.verificationService.verifyIfNoteExistsByUserAndId(loggedInUser, id);
+
         this.noteService.deleteByUserAndId(loggedInUser, id);
 
         response.setData("The note was deleted successfully");
