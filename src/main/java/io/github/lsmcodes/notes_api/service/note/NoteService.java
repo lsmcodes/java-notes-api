@@ -84,4 +84,11 @@ public interface NoteService {
      */
     void deleteByUserAndId(User user, UUID id);
 
+    /**
+     * Deletes notes based on the provided user.
+     * 
+     * @param user
+     */
+    void deleteByUser(User user);
+
 }

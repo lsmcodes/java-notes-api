@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 import io.github.lsmcodes.notes_api.model.note.Note;
 import io.github.lsmcodes.notes_api.model.user.User;
-import jakarta.transaction.Transactional;
 
 /**
  * Implements a Note repository with CRUD JPA methods and customized methods.
@@ -80,7 +79,13 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @param user The notes owner.
      * @param id   The id of the note to be deleted.
      */
-    @Transactional
     void deleteByUserAndId(User user, UUID id);
+
+    /**
+     * Delete notes based on the provided user.
+     * 
+     * @param user The notes owner.
+     */
+    void deleteByUser(User user);
 
 }

@@ -95,9 +95,6 @@ public class NoteController {
         note.setUser(loggedInUser);
         note = this.noteService.save(note);
 
-        loggedInUser.getNotes().add(note);
-        this.userService.save(loggedInUser);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(note.getId())
                 .toUri();
 
@@ -337,12 +334,9 @@ public class NoteController {
         User loggedInUser = this.userService.findByUsername(username).get();
 
         this.verificationService.verifyIfNoteExistsByUserAndId(loggedInUser, id);
-        Note note = this.noteService.findByUserAndId(loggedInUser, id).get();
-
-        loggedInUser.getNotes().remove(note);
         this.noteService.deleteByUserAndId(loggedInUser, id);
 
-        response.setData("The note \"" + note.getTitle() + "\" was deleted successfully");
+        response.setData("The note was deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

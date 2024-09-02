@@ -22,6 +22,7 @@ import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.exception.UserNotFoundException;
 import io.github.lsmcodes.notes_api.exception.UsernameAlreadyExistsException;
 import io.github.lsmcodes.notes_api.model.user.User;
+import io.github.lsmcodes.notes_api.service.note.NoteService;
 import io.github.lsmcodes.notes_api.service.user.UserService;
 import io.github.lsmcodes.notes_api.service.verification.VerificationService;
 import io.github.lsmcodes.notes_api.util.NotesApiUtil;
@@ -43,6 +44,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NoteService noteService;
 
     @Autowired
     private VerificationService verificationService;
@@ -174,6 +178,8 @@ public class UserController {
 
         this.verificationService.verifyIfUserExistsByUsername(username);
         User loggedInUser = this.userService.findByUsername(username).get();
+
+        this.noteService.deleteByUser(loggedInUser);
         this.userService.deleteById(loggedInUser.getId());
 
         response.setData("Your account was deleted successfully");

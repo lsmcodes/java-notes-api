@@ -68,8 +68,6 @@ public class NoteRepositoryTest {
         // Arrange
         User user = NotesApiUtil.getNewUser(this.userRepository);
         Note note = NotesApiUtil.getNewNote(this.noteRepository);
-
-        user.getNotes().add(note);
         note.setUser(user);
 
         // Act
@@ -91,8 +89,6 @@ public class NoteRepositoryTest {
         // Arrange
         User user = NotesApiUtil.getNewUser(this.userRepository);
         Note note = NotesApiUtil.getNewNote(this.noteRepository);
-
-        user.getNotes().add(note);
         note.setUser(user);
 
         // Act
@@ -119,7 +115,6 @@ public class NoteRepositoryTest {
         Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
         firstNote.setTitle("A sample title");
 
-        user.getNotes().addAll(List.of(firstNote, secondNote));
         firstNote.setUser(user);
         secondNote.setUser(user);
 
@@ -151,7 +146,6 @@ public class NoteRepositoryTest {
         Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
         secondNote.setTitle("A sample title");
 
-        user.getNotes().addAll(List.of(firstNote, secondNote));
         firstNote.setUser(user);
         secondNote.setUser(user);
 
@@ -184,7 +178,6 @@ public class NoteRepositoryTest {
         Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
         firstNote.setTitle("A sample title");
 
-        user.getNotes().addAll(List.of(firstNote, secondNote));
         firstNote.setUser(user);
         secondNote.setUser(user);
 
@@ -212,14 +205,35 @@ public class NoteRepositoryTest {
         Note note = NotesApiUtil.getNewNote(this.noteRepository);
         UUID noteId = note.getId();
 
-        user.getNotes().add(note);
         note.setUser(user);
 
         // Act and Assert
         assertThat(this.noteRepository.existsByUserAndId(user, noteId)).isTrue();
-        user.getNotes().remove(note);
         this.noteRepository.deleteByUserAndId(user, noteId);
         assertThat(this.noteRepository.existsByUserAndId(user, noteId)).isFalse();
+    }
+
+    /**
+     * Tests the {@link NoteRepository#deleteByUser(User user)} repository method to
+     * ensure it correctly deletes notes correctly by the provided user from the
+     * database.
+     */
+    @Test
+    @Order(8)
+    @DisplayName("NoteRepository deleteByUser method should delete correct notes")
+    public void deleteByUser_ShouldDeleteCorrectNotes() {
+        // Arrange
+        User user = NotesApiUtil.getNewUser(this.userRepository);
+        Note firstNote = NotesApiUtil.getNewNote(this.noteRepository);
+        Note secondNote = NotesApiUtil.getNewNote(this.noteRepository);
+
+        firstNote.setUser(user);
+        secondNote.setUser(user);
+
+        // Act and Assert
+        assertThat(this.noteRepository.findAll().size()).isEqualTo(2);
+        this.noteRepository.deleteByUser(user);
+        assertThat(this.noteRepository.findAll()).isEmpty();
     }
 
 }
