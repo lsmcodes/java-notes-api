@@ -95,9 +95,6 @@ public class NoteController {
         note.setUser(loggedInUser);
         note = this.noteService.save(note);
 
-        loggedInUser.getNotes().add(note);
-        this.userService.save(loggedInUser);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(note.getId())
                 .toUri();
 
@@ -172,7 +169,6 @@ public class NoteController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
         Page<Note> foundPage = this.noteService.findByUser(loggedInUser, pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -217,7 +213,6 @@ public class NoteController {
 
         Page<Note> foundPage = this.noteService.findByUserAndTitleOrContentContainingIgnoreCase(loggedInUser, term,
                 pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -261,7 +256,6 @@ public class NoteController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
         Page<Note> foundPage = this.noteService.findByUserAndTagsInIgnoreCase(loggedInUser, tags, pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -337,12 +331,37 @@ public class NoteController {
         User loggedInUser = this.userService.findByUsername(username).get();
 
         this.verificationService.verifyIfNoteExistsByUserAndId(loggedInUser, id);
-        Note note = this.noteService.findByUserAndId(loggedInUser, id).get();
-
-        loggedInUser.getNotes().remove(note);
         this.noteService.deleteByUserAndId(loggedInUser, id);
 
-        response.setData("The note \"" + note.getTitle() + "\" was deleted successfully");
+        response.setData("The note was deleted successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * Deletes all notes.
+     * 
+     * @return A {@link ResponseEntity} with a
+     *         {@link Response}<{@link NoteResponseDTO}> object.
+     * @throws UserNotFoundException if no user was found based in the username
+     *                               defined in the authentication.
+     * @throws NoteNotFoundException if no note was found with the provided id.
+     */
+    @Operation(summary = "Deletes all notes")
+    @SecurityRequirement(name = "JWT token")
+    @DeleteMapping
+    public ResponseEntity<Response<String>> deleteAll()
+            throws UserNotFoundException, NoteNotFoundException {
+        Response<String> response = new Response<>();
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        this.verificationService.verifyIfUserExistsByUsername(username);
+        User loggedInUser = this.userService.findByUsername(username).get();
+
+        this.noteService.deleteByUser(loggedInUser);
+
+        response.setData("All notes were deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

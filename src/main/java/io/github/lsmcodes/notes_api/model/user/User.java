@@ -1,6 +1,5 @@
 package io.github.lsmcodes.notes_api.model.user;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -12,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import io.github.lsmcodes.notes_api.dto.model.user.UserResponseDTO;
 import io.github.lsmcodes.notes_api.enumeration.UserRole;
-import io.github.lsmcodes.notes_api.model.note.Note;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,7 +18,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -57,10 +53,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private UserRole role;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Note> notes = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

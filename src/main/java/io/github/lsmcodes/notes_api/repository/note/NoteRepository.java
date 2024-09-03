@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 import io.github.lsmcodes.notes_api.model.note.Note;
 import io.github.lsmcodes.notes_api.model.user.User;
-import jakarta.transaction.Transactional;
 
 /**
  * Implements a Note repository with CRUD JPA methods and customized methods.
@@ -36,6 +35,8 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @return An {@link Optional} containing the note if found, or
      *         {@code Optional.empty()} if no note is found.
      */
+    @Query("SELECT n FROM notes n JOIN FETCH n.tags " +
+            "WHERE n.user = :user AND n.id = :id")
     Optional<Note> findByUserAndId(User user, UUID id);
 
     /**
@@ -45,6 +46,8 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @param pageable The pagination and sorting information.
      * @return A {@link Page} of notes sorted by creation date.
      */
+    @Query("SELECT n FROM notes n JOIN FETCH n.tags " +
+            "WHERE n.user = :user")
     Page<Note> findByUser(User user, Pageable pageable);
 
     /**
@@ -58,7 +61,9 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @return A {@link Page} of notes that contain the specified term in the title
      *         or content.
      */
-    @Query("SELECT n FROM notes n WHERE n.user = :user AND LOWER(n.title) LIKE LOWER(CONCAT('%', :term, '%')) OR LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%'))")
+    @Query("SELECT n FROM notes n JOIN FETCH n.tags " +
+            "WHERE n.user = :user AND LOWER(n.title) LIKE LOWER(CONCAT('%', :term, '%')) " +
+            "OR LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%'))")
     Page<Note> findByUserAndTitleOrContentContainingIgnoreCase(@Param("user") User user, @Param("term") String term,
             Pageable pageable);
 
@@ -72,6 +77,9 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @return A {@link Page} of notes that contain at least one of the specified
      *         tags.
      */
+    @Query("SELECT n FROM notes n JOIN FETCH n.tags t " +
+            "WHERE n.user = :user " +
+            "AND LOWER(t) IN (:tags)")
     Page<Note> findByUserAndTagsInIgnoreCase(User user, List<String> tags, Pageable pageable);
 
     /**
@@ -80,7 +88,13 @@ public interface NoteRepository extends JpaRepository<Note, UUID> {
      * @param user The notes owner.
      * @param id   The id of the note to be deleted.
      */
-    @Transactional
     void deleteByUserAndId(User user, UUID id);
+
+    /**
+     * Delete notes based on the provided user.
+     * 
+     * @param user The notes owner.
+     */
+    void deleteByUser(User user);
 
 }

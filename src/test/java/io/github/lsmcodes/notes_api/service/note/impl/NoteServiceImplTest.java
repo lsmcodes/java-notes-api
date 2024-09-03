@@ -167,7 +167,8 @@ public class NoteServiceImplTest {
                 .thenReturn(page);
 
         // Act
-        Page<Note> foundPage = this.noteServiceImpl.findByUserAndTitleOrContentContainingIgnoreCase(user, term, pageable);
+        Page<Note> foundPage = this.noteServiceImpl.findByUserAndTitleOrContentContainingIgnoreCase(user, term,
+                pageable);
         List<Note> pageContent = foundPage.getContent();
 
         // Assert
@@ -228,6 +229,26 @@ public class NoteServiceImplTest {
 
         // Assert
         Mockito.verify(this.noteRepository).deleteByUserAndId(user, id);
+    }
+
+    /**
+     * Tests the {@link NoteServiceImpl#deleteByUser(User user)} service method to
+     * ensure it interacts correctly with the
+     * {@link NoteRepository#deleteByUser(User user)} method providing the specified
+     * user.
+     */
+    @Test
+    @Order(8)
+    @DisplayName("NoteServiceImpl deleteByUser method should interact correctly with the repository")
+    public void deleteByUser_ShouldInteractCorrectlyWithTheRepository() {
+        // Arrange
+        User user = NotesApiUtil.getNewUser();
+
+        // Act
+        this.noteServiceImpl.deleteByUser(user);
+
+        // Assert
+        Mockito.verify(this.noteRepository).deleteByUser(user);
     }
 
 }

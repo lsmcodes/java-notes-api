@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +24,6 @@ import org.springframework.test.context.ActiveProfiles;
 import io.github.lsmcodes.notes_api.exception.NoteNotFoundException;
 import io.github.lsmcodes.notes_api.exception.UserNotFoundException;
 import io.github.lsmcodes.notes_api.exception.UsernameAlreadyExistsException;
-import io.github.lsmcodes.notes_api.model.note.Note;
 import io.github.lsmcodes.notes_api.model.user.User;
 import io.github.lsmcodes.notes_api.repository.user.UserRepository;
 import io.github.lsmcodes.notes_api.util.NotesApiUtil;
@@ -85,29 +83,12 @@ public class VerificationServiceTest {
 
     /**
      * Tests the
-     * {@link VerificationService#verifyIfPageOfNotesIsNotEmpty(Page notes)} to
-     * ensure it correctly throws a {@link NoteNotFoundException} when
-     * the {@link Page} is empty.
-     */
-    @Test
-    @Order(3)
-    @DisplayName("VerificationService verifyIfPageOfNotesIsNotEmpty method should throw NoteNotFoundException")
-    public void verifyIfPageOfNotesIsNotEmpty_ShouldThrowNoteNotFoundException_WhenPageIsEmpty() {
-        // Arrange
-        Page<Note> notes = Page.empty();
-
-        // Act and Assert
-        assertThrows(NoteNotFoundException.class, () -> this.verificationService.verifyIfPageOfNotesIsNotEmpty(notes));
-    }
-
-    /**
-     * Tests the
      * {@link VerificationService#verifyIfNoteExistsByUserAndId(User user, UUID id)}
      * to ensure it correctly throws a {@link NoteNotFoundException} when the note
      * does not exist.
      */
     @Test
-    @Order(4)
+    @Order(3)
     @DisplayName("VerificationService verifyIfNoteExistsByUserAndId method should throw NoteNotFoundException")
     public void verifyIfNoteExistsByUserAndId_ShouldThrowNoteNotFoundException_WhenNoteDoesNotExist() {
         // Arrange
@@ -123,7 +104,7 @@ public class VerificationServiceTest {
      * ensure it correctly returns true when user is authenticated.
      */
     @Test
-    @Order(5)
+    @Order(4)
     @DisplayName("VerificationService verifyIfCurrentUserIsAuthenticated method should return true when user is authenticated")
     public void verifyIfCurrentUserIsAuthenticated_ShouldReturnTrue_WhenUserIsAuthenticated() {
         // Arrange
@@ -143,7 +124,7 @@ public class VerificationServiceTest {
      * to ensure it correctly returns true when user is not authenticated.
      */
     @Test
-    @Order(6)
+    @Order(5)
     @DisplayName("VerificationService verifyIfCurrentUserIsNotAuthenticated method should return true when user is not authenticated")
     public void verifyIfCurrentUserIsNotAuthenticated_ShouldReturnTrue_WhenUserIsNotAuthenticated() {
         // Arrange

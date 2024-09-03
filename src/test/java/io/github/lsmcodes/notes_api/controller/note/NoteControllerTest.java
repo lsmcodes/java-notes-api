@@ -143,7 +143,6 @@ public class NoteControllerTest {
         Page<Note> page = new PageImpl<>(List.of(note), pageable, 1);
 
         Mockito.when(this.noteService.findByUser(user, pageable)).thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes")
@@ -181,7 +180,6 @@ public class NoteControllerTest {
 
         Mockito.when(this.noteService.findByUserAndTitleOrContentContainingIgnoreCase(user, term, pageable))
                 .thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-term")
@@ -219,7 +217,6 @@ public class NoteControllerTest {
         Page<Note> page = new PageImpl<>(List.of(note), pageable, 1);
 
         Mockito.when(this.noteService.findByUserAndTagsInIgnoreCase(user, tags, pageable)).thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-tags")
@@ -292,7 +289,29 @@ public class NoteControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/notes-api/notes/{id}", id)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value("The note \"" + note.getTitle() + "\" was deleted successfully"));
+                .andExpect(jsonPath("$.data").value("The note was deleted successfully"));
+    }
+
+    /**
+     * Tests the
+     * {@link NoteController#deleteAll()}
+     * to ensure it correctly deletes all notes and returns a message.
+     * 
+     * @throws Exception if an error occurs while deleting all notes.
+     */
+    @Test
+    @Order(6)
+    @WithMockUser(username = "default_user", roles = "USER")
+    @DisplayName("NoteController deleteAll should delete all notes and return message")
+    public void deleteAll_ShouldDeleteAllNotesAndReturnMessage() throws Exception {
+        // Arrange
+        this.setUpAuthenticatedUser();
+
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes-api/notes")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value("All notes were deleted successfully"));
     }
 
     /**

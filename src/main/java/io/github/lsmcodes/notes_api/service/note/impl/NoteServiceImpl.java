@@ -13,6 +13,7 @@ import io.github.lsmcodes.notes_api.model.note.Note;
 import io.github.lsmcodes.notes_api.model.user.User;
 import io.github.lsmcodes.notes_api.repository.note.NoteRepository;
 import io.github.lsmcodes.notes_api.service.note.NoteService;
+import jakarta.transaction.Transactional;
 
 /**
  * Implements {@link NoteService} interface methods.
@@ -74,9 +75,19 @@ public class NoteServiceImpl implements NoteService {
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public void deleteByUserAndId(User user, UUID id) {
         this.noteRepository.deleteByUserAndId(user, id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public void deleteByUser(User user) {
+        this.noteRepository.deleteByUser(user);
     }
 
 }

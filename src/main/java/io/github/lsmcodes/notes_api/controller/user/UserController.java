@@ -22,6 +22,7 @@ import io.github.lsmcodes.notes_api.enumeration.UserRole;
 import io.github.lsmcodes.notes_api.exception.UserNotFoundException;
 import io.github.lsmcodes.notes_api.exception.UsernameAlreadyExistsException;
 import io.github.lsmcodes.notes_api.model.user.User;
+import io.github.lsmcodes.notes_api.service.note.NoteService;
 import io.github.lsmcodes.notes_api.service.user.UserService;
 import io.github.lsmcodes.notes_api.service.verification.VerificationService;
 import io.github.lsmcodes.notes_api.util.NotesApiUtil;
@@ -43,6 +44,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NoteService noteService;
 
     @Autowired
     private VerificationService verificationService;
@@ -123,7 +127,7 @@ public class UserController {
      * @throws UsernameAlreadyExistsException If the provided username already
      *                                        exists in the database.
      */
-    @Operation(summary = "Updates logged-in user details (invalidates the current token)")
+    @Operation(summary = "Updates logged-in user details (invalidates the current JWT token, a new token must be issued, unless the details are reverted to their original values)")
     @SecurityRequirement(name = "JWT token")
     @PutMapping
     public ResponseEntity<Response<UserResponseDTO>> updateLoggedInUser(@RequestBody @Valid UserRequestDTO dto,
@@ -174,6 +178,8 @@ public class UserController {
 
         this.verificationService.verifyIfUserExistsByUsername(username);
         User loggedInUser = this.userService.findByUsername(username).get();
+
+        this.noteService.deleteByUser(loggedInUser);
         this.userService.deleteById(loggedInUser.getId());
 
         response.setData("Your account was deleted successfully");
