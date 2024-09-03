@@ -169,7 +169,6 @@ public class NoteController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
         Page<Note> foundPage = this.noteService.findByUser(loggedInUser, pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -214,7 +213,6 @@ public class NoteController {
 
         Page<Note> foundPage = this.noteService.findByUserAndTitleOrContentContainingIgnoreCase(loggedInUser, term,
                 pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -258,7 +256,6 @@ public class NoteController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
 
         Page<Note> foundPage = this.noteService.findByUserAndTagsInIgnoreCase(loggedInUser, tags, pageable);
-        this.verificationService.verifyIfPageOfNotesIsNotEmpty(foundPage);
 
         response.setData(foundPage.map(note -> note.entityToDTO()));
         return ResponseEntity.status(HttpStatus.OK).body(response);

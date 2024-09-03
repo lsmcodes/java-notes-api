@@ -143,7 +143,6 @@ public class NoteControllerTest {
         Page<Note> page = new PageImpl<>(List.of(note), pageable, 1);
 
         Mockito.when(this.noteService.findByUser(user, pageable)).thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes")
@@ -181,7 +180,6 @@ public class NoteControllerTest {
 
         Mockito.when(this.noteService.findByUserAndTitleOrContentContainingIgnoreCase(user, term, pageable))
                 .thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-term")
@@ -219,7 +217,6 @@ public class NoteControllerTest {
         Page<Note> page = new PageImpl<>(List.of(note), pageable, 1);
 
         Mockito.when(this.noteService.findByUserAndTagsInIgnoreCase(user, tags, pageable)).thenReturn(page);
-        Mockito.doNothing().when(this.verificationService).verifyIfPageOfNotesIsNotEmpty(page);
 
         // Act and Assert
         mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-tags")
