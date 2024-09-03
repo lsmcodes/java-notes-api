@@ -82,11 +82,13 @@ This API provides the following endpoints:
 | URI                                 | Method | Action                                                             | Parameters                                | Request Body |
 | ----------------------------------- | ------ | ------------------------------------------------------------------ | ----------------------------------------- | ------------ |
 | `/notes-api/notes`                | POST   | Creates a note                                                     | N/A                                       | Note Schema  |
+| `/notes-api/notes/{id}`           | GET    | Retrieves a note by id                                             | id                                        | N/A          |
 | `/notes-api/notes`                | GET    | Retrieves all notes                                                | page, size, property, sortDirection       | N/A          |
 | `/notes-api/notes/search/by-term` | GET    | Retrieves all notes containing a term whether in title or content | term, page, size, property, sortDirection | N/A          |
 | `/notes-api/notes/search/by-tags` | GET    | Retrieves all notes containing at least one of the specified tags  | tags, page, size, property, sortDirection | N/A          |
 | `/notes-api/notes/{id}`           | PUT    | Updates a note by id                                               | id                                        | Note Schema  |
 | `/notes-api/notes/{id}`           | DELETE | Deletes a note by id                                               | id                                        | N/A          |
+| `/notes-api/notes`                | DELETE | Deletes all notes                                                  | N/A                                       | N/A          |
 
 #### Note Schema
 
