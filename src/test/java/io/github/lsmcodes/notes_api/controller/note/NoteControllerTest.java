@@ -296,6 +296,28 @@ public class NoteControllerTest {
     }
 
     /**
+     * Tests the
+     * {@link NoteController#deleteAll()}
+     * to ensure it correctly deletes all notes and returns a message.
+     * 
+     * @throws Exception if an error occurs while deleting all notes.
+     */
+    @Test
+    @Order(6)
+    @WithMockUser(username = "default_user", roles = "USER")
+    @DisplayName("NoteController deleteAll should delete all notes and return message")
+    public void deleteAll_ShouldDeleteAllNotesAndReturnMessage() throws Exception {
+        // Arrange
+        this.setUpAuthenticatedUser();
+
+        // Act and Assert
+        mockMvc.perform(MockMvcRequestBuilders.delete("/notes-api/notes")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value("All notes were deleted successfully"));
+    }
+
+    /**
      * Configures a mock {@link User} entity for use in tests as an authenticated user.
      * 
      * @return The created {@link User} entity.

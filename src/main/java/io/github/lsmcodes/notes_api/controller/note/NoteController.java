@@ -334,10 +334,37 @@ public class NoteController {
         User loggedInUser = this.userService.findByUsername(username).get();
 
         this.verificationService.verifyIfNoteExistsByUserAndId(loggedInUser, id);
-
         this.noteService.deleteByUserAndId(loggedInUser, id);
 
         response.setData("The note was deleted successfully");
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    /**
+     * Deletes all notes.
+     * 
+     * @return A {@link ResponseEntity} with a
+     *         {@link Response}<{@link NoteResponseDTO}> object.
+     * @throws UserNotFoundException if no user was found based in the username
+     *                               defined in the authentication.
+     * @throws NoteNotFoundException if no note was found with the provided id.
+     */
+    @Operation(summary = "Deletes all notes")
+    @SecurityRequirement(name = "JWT token")
+    @DeleteMapping
+    public ResponseEntity<Response<String>> deleteAll()
+            throws UserNotFoundException, NoteNotFoundException {
+        Response<String> response = new Response<>();
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        this.verificationService.verifyIfUserExistsByUsername(username);
+        User loggedInUser = this.userService.findByUsername(username).get();
+
+        this.noteService.deleteByUser(loggedInUser);
+
+        response.setData("All notes were deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
