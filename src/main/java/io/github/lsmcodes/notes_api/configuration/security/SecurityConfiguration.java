@@ -51,7 +51,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(WHITELIST).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/notes-api/authentication").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/notes-api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/notes-api/users").permitAll()
                         .anyRequest().authenticated())
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
@@ -66,7 +66,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/notes-api/authentication").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/notes-api/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/notes-api/users").permitAll()
                         .requestMatchers("/notes-api/users").hasAnyRole("ADMIN", "USER")
                         .requestMatchers("/notes-api/notes", "/notes-api/notes/**").hasAnyRole("ADMIN", "USER")

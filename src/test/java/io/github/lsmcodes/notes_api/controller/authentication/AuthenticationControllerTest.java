@@ -76,7 +76,7 @@ public class AuthenticationControllerTest {
         Mockito.when(this.tokenService.generateToken((User) authentication.getPrincipal())).thenReturn(token);
 
         // Act and Assert
-        mockMvc.perform(MockMvcRequestBuilders.post("/notes-api/authentication")
+        mockMvc.perform(MockMvcRequestBuilders.post("/notes-api/login")
                 .content(new ObjectMapper().writeValueAsString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

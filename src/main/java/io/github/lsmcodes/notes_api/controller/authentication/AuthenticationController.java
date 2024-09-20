@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
  * Implements authentication endpoints.
  */
 @RestController
-@RequestMapping("notes-api/authentication")
+@RequestMapping("notes-api/login")
 @Tag(name = "Authentication", description = "Authentication endpoints")
 public class AuthenticationController {
 
