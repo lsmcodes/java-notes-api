@@ -193,7 +193,7 @@ public class NoteController {
      */
     @Operation(summary = "Retrieves all notes containing a specified term whether in title or content")
     @SecurityRequirement(name = "JWT token")
-    @GetMapping("/search/by-term")
+    @GetMapping("/term")
     public ResponseEntity<Response<Page<NoteResponseDTO>>> findByTitleOrContentContainingTerm(
             @RequestParam String term, @RequestParam(defaultValue = "0") @NotNull int page,
             @RequestParam(defaultValue = "10") @NotNull int size,
@@ -237,7 +237,7 @@ public class NoteController {
      */
     @Operation(summary = "Retrieves all notes containing at least one of the specified tags")
     @SecurityRequirement(name = "JWT token")
-    @GetMapping("/search/by-tags")
+    @GetMapping("/tags")
     public ResponseEntity<Response<Page<NoteResponseDTO>>> findByTags(@RequestParam List<String> tags,
             @RequestParam(defaultValue = "0") @NotNull int page,
             @RequestParam(defaultValue = "10") @NotNull int size,

@@ -182,7 +182,7 @@ public class NoteControllerTest {
                 .thenReturn(page);
 
         // Act and Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-term")
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/term")
                 .param("term", term)
                 .param("page", "0")
                 .param("size", "10")
@@ -219,7 +219,7 @@ public class NoteControllerTest {
         Mockito.when(this.noteService.findByUserAndTagsInIgnoreCase(user, tags, pageable)).thenReturn(page);
 
         // Act and Assert
-        mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/search/by-tags")
+        mockMvc.perform(MockMvcRequestBuilders.get("/notes-api/notes/tags")
                 .param("tags", "Tag")
                 .param("page", "0")
                 .param("size", "10")
